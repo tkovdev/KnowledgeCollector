@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build API",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "API/API.csproj"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder:KnowledgeCollector}"
+            },
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
