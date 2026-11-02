@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
-using KnowledgeCollector.API.TokenService.Interfaces;
+using KnowledgeCollector.Logic.Services.TokenService.Interfaces;
 
-namespace KnowledgeCollector.API.TokenService
+namespace KnowledgeCollector.Logic.Services.TokenService
 {
     public class AzureTokenService : ITokenService
     {
@@ -26,11 +26,9 @@ namespace KnowledgeCollector.API.TokenService
             _credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
         }
 
-        public async Task<string> GetTokenAsync(CancellationToken cancellationToken = default)
+        public TokenCredential GetTokenCredential()
         {
-            var context = new TokenRequestContext(_scopes);
-            AccessToken token = await _credential.GetTokenAsync(context, cancellationToken);
-            return token.Token;
+            return _credential;
         }
     }
 }

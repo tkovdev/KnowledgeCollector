@@ -1,5 +1,5 @@
-using KnowledgeCollector.API.TokenService;
-using KnowledgeCollector.API.TokenService.Interfaces;
+using KnowledgeCollector.Logic.Services.TokenService;
+using KnowledgeCollector.Logic.Services.TokenService.Interfaces;
 using KnowledgeCollector.Logic.Commands;
 
 var builder = WebApplication.CreateBuilder(args);
