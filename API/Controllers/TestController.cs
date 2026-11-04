@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using KnowledgeCollector.Logic.Commands;
+using KnowledgeCollector.Logic.Services.Interfaces;
 
 namespace KnowledgeCollector.API.Controllers
 {
@@ -8,16 +9,19 @@ namespace KnowledgeCollector.API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private readonly OpenAIChat _openAIChat;
-        public TestController(OpenAIChat openAIChat)
+        private readonly IAIChatService _aiChat;
+        public TestController(IAIChatService aiChat)
         {
-            _openAIChat = openAIChat;
+            _aiChat = aiChat;
         }
 
         [HttpPost("chat")]
         public async Task<IActionResult> SendMessage([FromBody] ChatRequest request)
         {
-            var response = await _openAIChat.SendMessageAsync(request.Message);
+            var instruction = """
+                You are tasked with creating one valuable question to ask the user regarding their team, to uncover processes and elicit information that will later be used to generate a quiz for others to assess their knowledge on the user's team.
+            """;
+            var response = await _aiChat.SendMessageAsync(instruction, request.Message);
             return Ok(new { response });
         }
     }

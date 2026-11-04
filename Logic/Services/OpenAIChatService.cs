@@ -1,16 +1,21 @@
 using Azure.AI.OpenAI;
 using Azure.Identity;
-using KnowledgeCollector.Logic.Services.TokenService.Interfaces;
+using KnowledgeCollector.Logic.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
+using Microsoft.Graph;
+using KnowledgeCollector.Logic.Tools;
+using System.Text.Json;
 
 namespace KnowledgeCollector.Logic.Commands;
 
-public class OpenAIChat
+public class OpenAIChatService : IAIChatService
 {
     private readonly ChatClient _chatClient;
-    public OpenAIChat(IConfiguration configuration, ITokenService tokenService)
+    private readonly Dictionary<string, ITool> _tools;
+    public OpenAIChatService(IConfiguration configuration, ITokenService tokenService, IEnumerable<ITool> tools)
     {
+        _tools = tools.ToDictionary(t => t.Name);
         var endpoint = configuration["AzureOpenAI:Endpoint"]
             ?? throw new InvalidOperationException("AzureOpenAI:Endpoint is not configured.");
         var deploymentName = configuration["AzureOpenAI:DeploymentName"]
@@ -25,26 +30,19 @@ public class OpenAIChat
         _chatClient = openAIClient.GetChatClient(deploymentName);
     }
 
-    public async Task<string> SendMessageAsync(string message)
+    public async Task<string> SendMessageAsync(string instruction, string message)
     {
-        var locationTool = ChatTool.CreateFunctionTool(
-            functionName: nameof(GetCurrentLocation),
-            functionDescription: "Get the user's current location"
-        );
-        List<ChatMessage> messages = [
-            new UserChatMessage("Tell me an interesting fact about my location")
-        ];
-        ChatCompletionOptions opts = new()
-        {
-            Tools = { locationTool }
-        };
+        List<ChatMessage> messages = [new SystemChatMessage(instruction), new UserChatMessage(message)];
+        ChatCompletionOptions opts = new();
+        foreach (var t in _tools.Values)
+            opts.Tools.Add(ChatTool.CreateFunctionTool(t.Name, t.Description, t.ParametersSchema));
 
         var reqAction = true;
         do
         {
             
             reqAction = false;
-            ChatCompletion completion = _chatClient.CompleteChat(messages, opts);
+            ChatCompletion completion = await _chatClient.CompleteChatAsync(messages, opts);
 
             switch (completion.FinishReason)
             {
@@ -59,19 +57,10 @@ public class OpenAIChat
                     messages.Add(new AssistantChatMessage(completion));
                     foreach (var toolCall in completion.ToolCalls)
                     {
-                        switch (toolCall.FunctionName)
-                        {
-                            case nameof(GetCurrentLocation):
-                                {
-                                    var res = GetCurrentLocation();
-                                    messages.Add(new ToolChatMessage(toolCall.Id, res));
-                                    break;
-                                }
-                            default:
-                                    {
-                                        throw new NotImplementedException("Tool not defined");
-                                    }
-                        }
+                        var tool = _tools.GetValueOrDefault(toolCall.FunctionName)
+                            ?? throw new NotImplementedException($"Tool {toolCall.FunctionName} not defined");
+                        var res = await tool.ExecuteAsync(toolCall.FunctionArguments.ToString());
+                        messages.Add(new ToolChatMessage(toolCall.Id, res));
                     }
                     reqAction = true;
                     break;
@@ -93,11 +82,5 @@ public class OpenAIChat
 
         var lastMessage = messages.LastOrDefault() ?? throw new Exception("Messages with chat are empty");
         return lastMessage.Content[0].Text.ToString() ?? throw new Exception("Messages with chat are empty");;
-    }
-
-    private static string GetCurrentLocation()
-    {
-        // Call the location API here.
-        return "San Francisco";
     }
 }

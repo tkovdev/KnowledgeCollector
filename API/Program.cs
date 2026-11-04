@@ -1,6 +1,7 @@
-using KnowledgeCollector.Logic.Services.TokenService;
-using KnowledgeCollector.Logic.Services.TokenService.Interfaces;
+using KnowledgeCollector.Logic.Services;
+using KnowledgeCollector.Logic.Services.Interfaces;
 using KnowledgeCollector.Logic.Commands;
+using KnowledgeCollector.Logic.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<ITokenService, AzureTokenService>();
-builder.Services.AddScoped<OpenAIChat>();
+builder.Services.AddScoped(sp => new Microsoft.Graph.GraphServiceClient(sp.GetRequiredService<ITokenService>().GetTokenCredential()));
+builder.Services.AddScoped<HttpClient>();
+builder.Services.AddScoped<ITool, FileReader>();
+builder.Services.AddScoped<IAIChatService, OpenAIChatService>();
 
 var app = builder.Build();
 

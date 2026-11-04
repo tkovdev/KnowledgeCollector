@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
-using KnowledgeCollector.Logic.Services.TokenService.Interfaces;
+using KnowledgeCollector.Logic.Services.Interfaces;
 
-namespace KnowledgeCollector.Logic.Services.TokenService
+namespace KnowledgeCollector.Logic.Services
 {
     public class AzureTokenService : ITokenService
     {
