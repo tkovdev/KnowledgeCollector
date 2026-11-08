@@ -11,6 +11,7 @@ namespace KnowledgeCollector.Logic.Services
 {
     public class AzureTokenService : ITokenService
     {
+        private readonly X509Certificate2 _certificate;
         private readonly TokenCredential _credential;
         private readonly string[] _scopes;
 
@@ -31,10 +32,17 @@ namespace KnowledgeCollector.Logic.Services
                 throw new FileNotFoundException($"The certificate file could not be found at: {certPath}");
             }
 
-            using var certificate = X509CertificateLoader.LoadPkcs12FromFile(certPath, String.Empty);
+            try
+            {
+                _certificate = X509CertificateLoader.LoadPkcs12FromFile(certPath, String.Empty);
+            } catch
+            {
+                if (_certificate is not null) _certificate.Dispose();
+                throw;
+            }
 
             _scopes = scopes ?? new[] { "https://management.azure.com/.default" };
-            _credential = new ClientCertificateCredential(tenantId, clientId, certificate);
+            _credential = new ClientCertificateCredential(tenantId, clientId, _certificate);
         }
 
         public TokenCredential GetTokenCredential()
