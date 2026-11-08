@@ -5,6 +5,7 @@ using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using KnowledgeCollector.Logic.Services.Interfaces;
+using System.Security.Cryptography.X509Certificates;
 
 namespace KnowledgeCollector.Logic.Services
 {
@@ -19,11 +20,21 @@ namespace KnowledgeCollector.Logic.Services
                 ?? throw new InvalidOperationException("AzureAd:TenantId is not configured.");
             var clientId = configuration["AzureAd:ClientId"]
                 ?? throw new InvalidOperationException("AzureAd:ClientId is not configured.");
-            var clientSecret = configuration["AzureAd:ClientSecret"]
+            var certRelativePath = configuration["AzureAd:CertificateRelativePath"]
                 ?? throw new InvalidOperationException("AzureAd:ClientSecret is not configured.");
 
+            //KeyVault can be used to generate the PFX, create the PFX and export it in Pkcs12. Passwords will be blank. Certificate can be included in the /Certificates path of the build. Do not commit PFX to code.
+            string certPath = Path.Combine(AppContext.BaseDirectory, certRelativePath);
+
+            if (!File.Exists(certPath))
+            {
+                throw new FileNotFoundException($"The certificate file could not be found at: {certPath}");
+            }
+
+            using var certificate = X509CertificateLoader.LoadPkcs12FromFile(certPath, String.Empty);
+
             _scopes = scopes ?? new[] { "https://management.azure.com/.default" };
-            _credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+            _credential = new ClientCertificateCredential(tenantId, clientId, certificate);
         }
 
         public TokenCredential GetTokenCredential()
