@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using KnowledgeCollector.Logic.Commands;
-using KnowledgeCollector.Logic.Services.Interfaces;
+using Mediator.Interfaces;
+using Command.Chat;
 
 namespace KnowledgeCollector.API.Controllers
 {
@@ -9,20 +9,18 @@ namespace KnowledgeCollector.API.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private readonly IAIChatService _aiChat;
-        public TestController(IAIChatService aiChat)
+        private readonly IMediator _mediator;
+
+        public TestController(IMediator mediator)
         {
-            _aiChat = aiChat;
+            _mediator = mediator;
         }
 
         [HttpPost("chat")]
         public async Task<IActionResult> SendMessage([FromBody] ChatRequest request)
         {
-            var instruction = """
-                You are tasked with creating one valuable question to ask the user regarding their team, to uncover processes and elicit information that will later be used to generate a quiz for others to assess their knowledge on the user's team.
-            """;
-            var response = await _aiChat.SendMessageAsync(instruction, request.Message);
-            return Ok(new { response });
+            await _mediator.Send(new BeginChat());
+            return Ok();
         }
     }
 

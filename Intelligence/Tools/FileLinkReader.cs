@@ -1,7 +1,7 @@
 using Aspose.Pdf.Text;
 using Microsoft.Graph;
 
-namespace KnowledgeCollector.Logic.Tools;
+namespace KnowledgeCollector.Intelligence.Tools;
 public record FileReaderArgs(string Uri);
 
 public class FileReader(GraphServiceClient graphClient, HttpClient httpClient) : ToolBase<FileReaderArgs>

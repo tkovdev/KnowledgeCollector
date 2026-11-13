@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Certificates/knowledgecollector.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Aspose.OCR" Version="26.10.0" />
     <PackageReference Include="Aspose.PDF" Version="26.10.0" />
     <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />

@@ -1,6 +1,6 @@
 using Azure.Core;
 
-namespace KnowledgeCollector.Logic.Services.Interfaces;
+namespace KnowledgeCollector.Intelligence.Services.Interfaces;
 
 /// <summary>
 /// Acquires access tokens from Azure (Microsoft Entra ID) for the service principal.

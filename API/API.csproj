@@ -8,13 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
-    <PackageReference Include="Azure.Identity" Version="1.*" />
+    <Content Include="Certificates/knowledgecollector.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Logic\Logic.csproj" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+    <PackageReference Include="Azure.Identity" Version="1.*" />
+    <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Intelligence\Intelligence.csproj" />
+    <ProjectReference Include="..\Mediator\Mediator.csproj" />
+    <ProjectReference Include="..\Command\Command.csproj" />
+    <ProjectReference Include="..\Query\Query.csproj" />
   </ItemGroup>
 
 </Project>

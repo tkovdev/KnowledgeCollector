@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace KnowledgeCollector.Logic.Tools;
+namespace KnowledgeCollector.Intelligence.Tools;
 
 public interface ITool
 {

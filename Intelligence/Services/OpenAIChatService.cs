@@ -1,13 +1,10 @@
 using Azure.AI.OpenAI;
-using Azure.Identity;
-using KnowledgeCollector.Logic.Services.Interfaces;
+using KnowledgeCollector.Intelligence.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
-using Microsoft.Graph;
-using KnowledgeCollector.Logic.Tools;
-using System.Text.Json;
+using KnowledgeCollector.Intelligence.Tools;
 
-namespace KnowledgeCollector.Logic.Commands;
+namespace KnowledgeCollector.Intelligence.Commands;
 
 public class OpenAIChatService : IAIChatService
 {
@@ -30,9 +27,8 @@ public class OpenAIChatService : IAIChatService
         _chatClient = openAIClient.GetChatClient(deploymentName);
     }
 
-    public async Task<string> SendMessageAsync(string instruction, string message)
+    public async Task<List<ChatMessage>> SendMessageAsync(List<ChatMessage> messages)
     {
-        List<ChatMessage> messages = [new SystemChatMessage(instruction), new UserChatMessage(message)];
         ChatCompletionOptions opts = new();
         foreach (var t in _tools.Values)
             opts.Tools.Add(ChatTool.CreateFunctionTool(t.Name, t.Description, t.ParametersSchema));
@@ -81,6 +77,8 @@ public class OpenAIChatService : IAIChatService
         } while (reqAction);
 
         var lastMessage = messages.LastOrDefault() ?? throw new Exception("Messages with chat are empty");
-        return lastMessage.Content[0].Text.ToString() ?? throw new Exception("Messages with chat are empty");;
+        var lastMessageContent = lastMessage.Content[0].Text.ToString() ?? throw new Exception("Messages with chat are empty");
+
+        return messages;
     }
 }

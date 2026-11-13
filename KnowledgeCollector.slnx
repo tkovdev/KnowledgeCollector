@@ -1,4 +1,8 @@
 <Solution>
   <Project Path="API/API.csproj" />
-  <Project Path="Logic/Logic.csproj" />
+  <Project Path="Command/Command.csproj" />
+  <Project Path="Data/Data.csproj" />
+  <Project Path="Intelligence/Intelligence.csproj" />
+  <Project Path="Mediator/Mediator.csproj" />
+  <Project Path="Query/Query.csproj" />
 </Solution>

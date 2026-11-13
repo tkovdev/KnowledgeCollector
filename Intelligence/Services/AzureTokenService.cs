@@ -1,13 +1,10 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
-using KnowledgeCollector.Logic.Services.Interfaces;
+using KnowledgeCollector.Intelligence.Services.Interfaces;
 using System.Security.Cryptography.X509Certificates;
 
-namespace KnowledgeCollector.Logic.Services
+namespace KnowledgeCollector.Intelligence.Services
 {
     public class AzureTokenService : ITokenService
     {
