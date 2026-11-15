@@ -2,9 +2,9 @@ using MongoDB.Bson;
 
 namespace Mediator.Interfaces;
 
-public interface ICommand;
+public interface ICommand<TResult>;
 
-public interface ICommandHandler<in TCommand> where TCommand : ICommand
+public interface ICommandHandler<in TCommand, TResult> where TCommand : ICommand<TResult>
 {
-    Task Handle(TCommand command, CancellationToken cancellationToken);
+    Task<TResult> Handle(TCommand command, CancellationToken cancellationToken);
 }

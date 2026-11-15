@@ -4,10 +4,12 @@ using Mediator.Interfaces;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
 using KnowledgeCollector.Intelligence.Services.Interfaces;
+using Data;
+using Data.Mappers;
 
 namespace Command.Chat;
 
-public class BeginChat : ICommand
+public class BeginChat : ICommand<ObjectId>
 {
     [BsonId]
     public ObjectId Id { get; set; } = ObjectId.Empty;
@@ -18,7 +20,7 @@ public class BeginChat : ICommand
     public List<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
 }
 
-public class BeginChatHandler : ICommandHandler<BeginChat>
+public class BeginChatHandler : ICommandHandler<BeginChat, ObjectId>
 {
     private IMongoDatabase _db {get;}
     private IAIChatService _aiChat {get;}
@@ -29,7 +31,7 @@ public class BeginChatHandler : ICommandHandler<BeginChat>
         _aiChat = aiChat;
     }
 
-    public async Task Handle(BeginChat command, CancellationToken cancellationToken)
+    public async Task<ObjectId> Handle(BeginChat command, CancellationToken cancellationToken)
     {
         if (!command.Id.Equals(ObjectId.Empty)) 
             throw new Exception("A chat cannot be restarted. Please use BeginChat without an ObjectId");
@@ -42,14 +44,19 @@ public class BeginChatHandler : ICommandHandler<BeginChat>
 
         command.Messages = messages;
 
-        var response = await _aiChat.SendMessageAsync(command.Messages);
+        var history = await _aiChat.SendMessageAsync(command.Messages);
 
-        command.Messages = response;
+        command.Messages = history;
 
-        await _db.GetCollection<BeginChat>("sessions")
-            .InsertOneAsync(command);
+        var session = new Session
+        {
+            UserId = command.UserId,
+            Messages = history.Select(SessionMapper.ToStored).ToList()
+        };
 
-        // return beginChatOptions.Session;
-        return;
+        await _db.GetCollection<Session>("sessions")
+            .InsertOneAsync(session);
+
+        return session.Id;
     }
 }

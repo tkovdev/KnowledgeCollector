@@ -19,8 +19,8 @@ namespace KnowledgeCollector.API.Controllers
         [HttpPost("chat")]
         public async Task<IActionResult> SendMessage([FromBody] ChatRequest request)
         {
-            await _mediator.Send(new BeginChat());
-            return Ok();
+            var sessionId = await _mediator.Send(new BeginChat());
+            return Ok(new { SessionId = sessionId.ToString() });
         }
     }
 

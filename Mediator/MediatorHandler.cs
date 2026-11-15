@@ -12,13 +12,13 @@ public static class MediatorHandler
 
         // Register command handlers
         var commandHandlerTypes = commandAssembly.GetTypes()
-            .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>)))
+            .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<,>)))
             .ToList();
 
         foreach (var handlerType in commandHandlerTypes)
         {
             var interfaceType = handlerType.GetInterfaces()
-                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<>));
+                .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICommandHandler<,>));
             services.AddScoped(interfaceType, handlerType);
         }
 

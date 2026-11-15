@@ -12,14 +12,14 @@ public class Mediator : IMediator
         _serviceProvider = serviceProvider;
     }
 
-    public async Task Send(ICommand command, CancellationToken cancellationToken = default)
+    public async Task<TResult> Send<TResult>(ICommand<TResult> command, CancellationToken cancellationToken = default)
     {
-        var handlerType = typeof(ICommandHandler<>).MakeGenericType(command.GetType());
+        var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResult));
         var handler = _serviceProvider.GetService(handlerType);
         if (handler == null)
             throw new InvalidOperationException($"No handler registered for command {command.GetType().Name}");
 
-        await ((dynamic)handler).Handle((dynamic)command, cancellationToken);
+        return await ((dynamic)handler).Handle((dynamic)command, cancellationToken);
     }
 
     public async Task<TResult> Send<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
