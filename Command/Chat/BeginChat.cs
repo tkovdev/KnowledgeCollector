@@ -36,10 +36,13 @@ public class BeginChatHandler : ICommandHandler<BeginChat, ObjectId>
         if (!command.Id.Equals(ObjectId.Empty)) 
             throw new Exception("A chat cannot be restarted. Please use BeginChat without an ObjectId");
         
+        var configuration = await _db.GetCollection<Configuration>("configurations")
+            .Find(x => x.Name.Equals("AgentInstruction")).FirstOrDefaultAsync(cancellationToken);
 
-        var instruction = """
-            You are tasked with creating one valuable question to ask the user regarding their team, to uncover processes and elicit information that will later be used to generate a quiz for others to assess their knowledge on the user's team.
-        """;
+        if (configuration is null) throw new ArgumentNullException("Configuration: \"AgentInstruction\" is required. Ensure the database includes this.");
+
+        var instruction = configuration.Value;
+
         List<ChatMessage> messages = [new SystemChatMessage(instruction)];
 
         command.Messages = messages;

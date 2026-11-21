@@ -70,13 +70,7 @@ The API listens on `https://localhost:7191` and `http://localhost:5214` (see `AP
 In Development the OpenAPI document is available at `/openapi/v1.json`.
 
 ### Usage
-Send a message to the chat endpoint:
-```
-curl -X POST https://localhost:7191/api/test/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "I work on the billing team."}'
-```
-Response: `{ "response": "<generated question>" }`
+TODO: Add examples
 
 ## Project Structure
 - `API` - ASP.NET Core Web API (controllers, startup/DI configuration)

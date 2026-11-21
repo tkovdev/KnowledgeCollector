@@ -1,9 +1,22 @@
 using OpenAI.Chat;
+using System.Text.Json;
 
 namespace Data.Mappers;
 
 public static class SessionMapper
 {
+    public static string ToJson(Session session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+
+        return JsonSerializer.Serialize(new
+        {
+            Id = session.Id.ToString(),
+            session.UserId,
+            session.Messages
+        }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+    }
+
     public static SessionMessage ToStored(ChatMessage message)
     {
         ArgumentNullException.ThrowIfNull(message);

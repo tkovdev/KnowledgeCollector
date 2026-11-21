@@ -1,7 +1,10 @@
 using Command.Chat;
+using Data.Mappers;
 using Mediator.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using Query.Chat;
 
 namespace MyApp.Namespace
 {
@@ -16,8 +19,19 @@ namespace MyApp.Namespace
             _mediator = mediator;
         }
 
+        [HttpGet("{sessionId}")]
+        public async Task<IActionResult> GetChat([FromRoute] string sessionId)
+        {
+            var id = ObjectId.Parse(sessionId);
+            var history = await _mediator.Send(new GetChatSession(){Id = id});
+            if (history is null)
+                return NotFound();
+
+            return Ok(SessionMapper.ToJson(history));
+        }        
+        
         [HttpPost]
-        public async Task<IActionResult> BeginChat([FromBody] ChatRequest request)
+        public async Task<IActionResult> BeginChat()
         {
             var sessionId = await _mediator.Send(new BeginChat());
             return Ok(new { SessionId = sessionId.ToString() });
@@ -35,4 +49,3 @@ namespace MyApp.Namespace
     }
 }
     public record ChatRequest(string? SessionId, string Message);
-

@@ -10,6 +10,9 @@ public class GetChatSession : IQuery<Session>
 {
     [BsonId]
     public ObjectId Id { get; set; }
+    
+    [BsonGuidRepresentation(GuidRepresentation.Standard)]
+    public Guid UserId { get; set; } = Guid.Empty;
 }
 
 public class GetChatSessionHandler : IQueryHandler<GetChatSession, Session>
@@ -20,19 +23,10 @@ public class GetChatSessionHandler : IQueryHandler<GetChatSession, Session>
         _db = db;
     }
 
-    // public override async Task<IList<IQueryResult>> GetAsync(Guid userId)
-    // {
-    //     var sessions = await _db.GetCollection<Session>("sessions")
-    //         .Find(session => session.UserId == userId)
-    //         .ToListAsync();
-
-    //     return sessions.Cast<IQueryResult>().ToList();
-    // }
-
     public async Task<Session> Handle(GetChatSession query, CancellationToken cancellationToken)
     {
         return await _db.GetCollection<Session>("sessions")
-            .Find(session => session.Id == query.Id)
+            .Find(session => session.Id.Equals(query.Id) && session.UserId.Equals(query.UserId))
             .FirstOrDefaultAsync();
     }
 }
