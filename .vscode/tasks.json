@@ -17,6 +17,41 @@
                 "kind": "build",
                 "isDefault": true
             }
-        }
+        },
+        {
+            "label": "build App",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "App/App.csproj"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder:KnowledgeCollector}"
+            },
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": ["build Angular"]
+        },
+        {
+            "label": "build Angular",
+            "type": "shell",
+            "command": "ng",
+            "args": [
+                "build",
+                "--configuration=production"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder:KnowledgeCollector}/App/ClientApp"
+            },
+            "problemMatcher": "$eslint-compact",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
     ]
 }

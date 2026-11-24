@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="API/API.csproj" />
+  <Project Path="App/App.csproj" />
   <Project Path="Command/Command.csproj" />
   <Project Path="Data/Data.csproj" />
   <Project Path="Intelligence/Intelligence.csproj" />
