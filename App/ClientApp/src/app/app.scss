@@ -1,0 +1,90 @@
+:host {
+  display: block;
+}
+
+.page {
+  width: min(100% - 2rem, 64rem);
+  margin: 0 auto;
+  padding: clamp(3rem, 8vw, 6rem) 0;
+}
+
+.intro {
+  max-width: 44rem;
+  margin-bottom: clamp(3rem, 8vw, 5rem);
+}
+
+.eyebrow {
+  color: #176051;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 1rem 0;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.intro__description {
+  max-width: 38rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.entry-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.5rem;
+  background: #176051;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.entry-link:hover {
+  background: #10483d;
+}
+
+.entry-link:focus-visible {
+  outline: 3px solid #172a3a;
+  outline-offset: 3px;
+}
+
+.interview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 2rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid #d5e0dc;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.interview h2 {
+  margin: 0.5rem 0;
+  font-size: 1.75rem;
+}
+
+.interview p {
+  line-height: 1.6;
+}
+
+.interview__status {
+  align-self: center;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  background: #edf4f1;
+}
+
+.interview__status h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.interview__status p {
+  margin: 0.5rem 0 0;
+}
