@@ -11,6 +11,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Restore API certificate
+        env:
+          API_CERTIFICATE_PFX_BASE64: ${{ secrets.API_CERTIFICATE_PFX_BASE64 }}
+        run: |
+          if [ -z "$API_CERTIFICATE_PFX_BASE64" ]; then
+            echo "The API_CERTIFICATE_PFX_BASE64 Actions secret is required."
+            exit 1
+          fi
+          mkdir -p API/Certificates
+          printf '%s' "$API_CERTIFICATE_PFX_BASE64" | base64 --decode > API/Certificates/knowledgecollector.pfx
+
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -25,6 +36,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: App/ClientApp/package-lock.json
+
+      - name: Install Angular dependencies
+        working-directory: App/ClientApp
+        run: npm ci
+
+      - name: Build Angular app
+        working-directory: App/ClientApp
+        run: npm run build -- --configuration production
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4

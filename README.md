@@ -32,6 +32,14 @@ service principal. It does not use an Azure client secret.
 5. Assign the app registration's service principal the `Cognitive Services OpenAI User` role on the
    Azure OpenAI resource.
 
+### GitHub Actions build certificate
+
+The API project includes `API/Certificates/knowledgecollector.pfx` in its build output. The
+certificate is intentionally excluded from source control. To let the **Build** workflow build the
+API, add a repository Actions secret named `API_CERTIFICATE_PFX_BASE64` containing the
+base64-encoded private PFX file. The workflow recreates the file before building and fails clearly
+if the secret is not configured. Keep the unencoded PFX and its encoded secret private.
+
 ## Configure and run the API
 
 The API reads its configuration from `API/appsettings.json`, environment variables, or .NET User
