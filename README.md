@@ -38,12 +38,14 @@ Two workflows build and deploy the project. Both are in `.github/workflows/`.
 
 | Workflow | File | Trigger | What it does |
 |----------|------|---------|--------------|
-| Build | `build.yml` | Manual (**Actions** tab → **Build** → **Run workflow**) | Builds the API (`API/API.csproj`). Builds the Angular client and publishes the App (`App/App.csproj`), then uploads it as an artifact named `app`. |
+| Build | `build.yml` | Pull request merged into `main`, or manual (**Actions** tab → **Build** → **Run workflow**) | Builds the API (`API/API.csproj`). Builds the Angular client and publishes the App (`App/App.csproj`), then uploads it as an artifact named `app`. |
 | Deploy App | `deploy-app.yml` | Automatically after a successful **Build** run | Downloads the `app` artifact and deploys it to the Azure App Service. |
 
-To deploy, run **Build** manually; **Deploy App** starts on its own once Build succeeds. Because
-`workflow_run` workflows only run from the repository's default branch, `deploy-app.yml` must be
-merged there before it triggers.
+Merging a pull request into `main` builds the merged commit; closing a pull request without merging
+does not build. You can also run **Build** manually. **Deploy App** starts on its own once either
+build succeeds. Because `workflow_run` workflows only run from the repository's default branch,
+`deploy-app.yml` must be merged there before it triggers. These workflows are not PR validation
+checks; the automatic build runs after the merge.
 
 Only the App (Angular client hosted by ASP.NET Core) is deployed. The API is built but not yet
 deployed.
@@ -101,7 +103,8 @@ Keep both the PFX and its encoded value private.
 
 ### Deploying
 
-1. Open the repository's **Actions** tab, select **Build**, and choose **Run workflow**.
+1. Merge a pull request into `main`, or open the repository's **Actions** tab, select **Build**,
+   and choose **Run workflow**.
 2. When Build succeeds, **Deploy App** starts automatically. Track it in the same tab.
 3. Browse to the App Service URL to confirm the Angular client loads.
 
