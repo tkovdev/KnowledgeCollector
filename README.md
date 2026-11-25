@@ -32,13 +32,81 @@ service principal. It does not use an Azure client secret.
 5. Assign the app registration's service principal the `Cognitive Services OpenAI User` role on the
    Azure OpenAI resource.
 
-### GitHub Actions build certificate
+## Build and deploy (GitHub Actions)
 
-The API project includes `API/Certificates/knowledgecollector.pfx` in its build output. The
-certificate is intentionally excluded from source control. To let the **Build** workflow build the
-API, add a repository Actions secret named `API_CERTIFICATE_PFX_BASE64` containing the
-base64-encoded private PFX file. The workflow recreates the file before building and fails clearly
-if the secret is not configured. Keep the unencoded PFX and its encoded secret private.
+Two workflows build and deploy the project. Both are in `.github/workflows/`.
+
+| Workflow | File | Trigger | What it does |
+|----------|------|---------|--------------|
+| Build | `build.yml` | Manual (**Actions** tab → **Build** → **Run workflow**) | Builds the API (`API/API.csproj`). Builds the Angular client and publishes the App (`App/App.csproj`), then uploads it as an artifact named `app`. |
+| Deploy App | `deploy-app.yml` | Automatically after a successful **Build** run | Downloads the `app` artifact and deploys it to the Azure App Service. |
+
+To deploy, run **Build** manually; **Deploy App** starts on its own once Build succeeds. Because
+`workflow_run` workflows only run from the repository's default branch, `deploy-app.yml` must be
+merged there before it triggers.
+
+Only the App (Angular client hosted by ASP.NET Core) is deployed. The API is built but not yet
+deployed.
+
+### One-time setup
+
+**Azure**
+
+1. Create an App Service for the App with a **.NET 10** runtime stack.
+2. Enable basic authentication for deployment. New App Services have it off, and the publish profile
+   download fails with "basic authentication is turned off" until it is on. Under
+   **Settings** → **Configuration** → **General settings**, set **SCM Basic Auth Publishing
+   Credentials** to **On** (also set **FTP Basic Auth Publishing Credentials** to **On** if the
+   profile still won't download), then **Save**.
+3. Download the publish profile from the **Overview** page (**Get publish profile**).
+
+**GitHub** (**Settings** → **Secrets and variables** → **Actions**)
+
+Where a value lives depends on which job reads it. Jobs that declare an `environment:` (the deploy
+job uses `Development`) can read that environment's values and repository values. Jobs without one
+(the Build job) can read **repository** values only.
+
+1. Create an environment named `Development` (**Settings** → **Environments** → **New
+   environment**). Optionally add required reviewers there to gate deployments.
+2. Add these to the **`Development` environment** (**Environments** → `Development` →
+   **Environment secrets** / **Environment variables**). They are specific to the dev App Service
+   and are only read by the deploy job:
+
+   | Type | Name | Value |
+   |------|------|-------|
+   | Secret | `AZURE_WEBAPP_PUBLISH_PROFILE` | Full contents of the App Service publish profile |
+   | Variable | `AZURE_WEBAPP_NAME` | App Service name |
+
+3. Add this as a **repository secret** (**Secrets and variables** → **Actions** → **Repository
+   secrets**). The Build job has no environment, so it can't read environment secrets:
+
+   | Type | Name | Value |
+   |------|------|-------|
+   | Secret | `API_CERTIFICATE_PFX_BASE64` | Base64-encoded private PFX used by the API (see below) |
+
+Adding another environment later (for example `Production`) with its own
+`AZURE_WEBAPP_PUBLISH_PROFILE` and `AZURE_WEBAPP_NAME` lets the same workflow deploy elsewhere
+without renaming anything.
+
+**API certificate secret.** The API project includes `API/Certificates/knowledgecollector.pfx` in its
+build output. The file is intentionally excluded from source control, so the **Build** workflow
+recreates it from `API_CERTIFICATE_PFX_BASE64` and fails clearly if the secret is missing. Create
+the value on macOS or Linux with:
+
+```sh
+base64 -i API/Certificates/knowledgecollector.pfx | tr -d '\n'
+```
+
+Keep both the PFX and its encoded value private.
+
+### Deploying
+
+1. Open the repository's **Actions** tab, select **Build**, and choose **Run workflow**.
+2. When Build succeeds, **Deploy App** starts automatically. Track it in the same tab.
+3. Browse to the App Service URL to confirm the Angular client loads.
+
+If a deployment fails, check the **Deploy App** logs first. A missing `AZURE_WEBAPP_NAME`,
+`AZURE_WEBAPP_PUBLISH_PROFILE`, or `Development` environment is the most common cause.
 
 ## Configure and run the API
 

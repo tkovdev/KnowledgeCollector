@@ -57,5 +57,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Build App
-        run: dotnet build App/App.csproj --configuration Release
+      - name: Publish App
+        run: dotnet publish App/App.csproj --configuration Release --output ./publish
+
+      - name: Upload App artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: ./publish
