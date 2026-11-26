@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using Query.Chat;
 
-namespace MyApp.Namespace
+namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
