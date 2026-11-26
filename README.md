@@ -201,6 +201,13 @@ issue with the `FE_ASSIGNEE` repository variable and add it to a GitHub Project 
 `FE_AUTOMATION_TOKEN`, `FE_PROJECT_ID`, `FE_STATUS_FIELD_ID`, and `FE_TODO_OPTION_ID` repository
 secrets.
 
+### Draft a frontend backlog
+
+Use the [frontend-pbl skill](.github/skills/frontend-pbl/SKILL.md), or ask Copilot to create a
+frontend product backlog for a feature. The skill prepares a scratch draft for review and waits for
+explicit approval before creating GitHub issues. By default, drafts are stored in the Git-ignored
+`.github/skills/frontend-pbl/scratch/` directory.
+
 ## Project structure
 
 - `API` — ASP.NET Core API, controllers, startup, and OpenAPI configuration

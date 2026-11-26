@@ -3,3 +3,4 @@
 appsettings.*
 Certificates/
 .DS_Store
+.github/skills/frontend-pbl/scratch/*
